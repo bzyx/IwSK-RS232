@@ -1,0 +1,1 @@
+C:\Python27\Lib\site-packages\PyQt4\pyuic4.bat ui\iwsk.ui -x -o ui\iwsk.py
