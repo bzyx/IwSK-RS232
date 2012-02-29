@@ -25,5 +25,11 @@ class Config (object):
         self.serial.applySettingsDict(setting)
 
 if __name__ == "__main__":
-    conf = Config()
-    print conf.serial
+    configTest = Config()
+    print configTest.serial
+    configTest.serial.baudrate = 19200
+    configTest.save()
+    del configTest
+    configTestFile = Config()
+    configTestFile.load()
+    print configTestFile.serial
