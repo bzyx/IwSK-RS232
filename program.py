@@ -13,9 +13,12 @@ class MyDialog(QtGui.QDialog):
         self.ui.setupUi(self)
 
         myConfig = Config()
-        QtCore.QObject.connect(self.ui.btn_open, QtCore.SIGNAL("clicked()"), myConfig.serial.open)
-        QtCore.QObject.connect(self.ui.btn_close, QtCore.SIGNAL("clicked()"), myConfig.serial.close)
-        QtCore.QObject.connect(self.ui.btn_save, QtCore.SIGNAL("clicked()"), myConfig.save)
+        #QtCore.QObject.connect(self.ui.btn_open, QtCore.SIGNAL("clicked()"), myConfig.serial.open)
+        #QtCore.QObject.connect(self.ui.btn_close, QtCore.SIGNAL("clicked()"), myConfig.serial.close)
+        #QtCore.QObject.connect(self.ui.btn_save, QtCore.SIGNAL("clicked()"), myConfig.save)
+        self.ui.btn_open.clicked.connect(myConfig.serial.open)
+        self.ui.btn_close.clicked.connect(myConfig.serial.close)
+        self.ui.btn_save.clicked.connect(myConfig.save)
 
         for baudRate in myConfig.serial.BAUDRATES:
             self.ui.i_baudRate_comboBox.addItem(repr(baudRate))
