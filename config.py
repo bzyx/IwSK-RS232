@@ -1,11 +1,12 @@
 import cPickle
 from serial import Serial
 
-class Config (object):
+
+class Config(object):
     """Default configuration for programing."""
 
     configName = "config.db"
-    serial = Serial(0)
+    serial = Serial()
 
     def __init__(self):
         super(Config, self).__init__()
@@ -16,20 +17,24 @@ class Config (object):
 
     def save(self):
         with open(self.configName, "wb") as fileConfig:
-            setting = self.serial.getSettingsDict()
-            cPickle.dump(setting, fileConfig)
+            self.serialDict = self.serial.getSettingsDict()
+            cPickle.dump(self.serialDict, fileConfig)
+            Config.serial.applySettingsDict(self.serialDict)
 
     def load(self):
         with open(self.configName, "rb") as fileConfig:
-            setting = cPickle.load(fileConfig)
-        self.serial.applySettingsDict(setting)
+            self.serialDict = cPickle.load(fileConfig)
+            Config.serial.applySettingsDict(self.serialDict)
 
 if __name__ == "__main__":
     configTest = Config()
     print configTest.serial
-    configTest.serial.baudrate = 19200
     configTest.save()
-    del configTest
-    configTestFile = Config()
-    configTestFile.load()
-    print configTestFile.serial
+    configTest.load()
+    print configTest.serialDict
+    # configTest.serial.baudrate = 19200
+    # configTest.save()
+    # del configTest
+    # configTestFile = Config()
+    # configTestFile.load()
+    # print configTestFile.serial

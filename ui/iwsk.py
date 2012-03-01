@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\iwsk.ui'
+# Form implementation generated from reading ui file 'ui\iwsk.ui'
 #
-# Created: Wed Feb 22 17:45:31 2012
-#      by: PyQt4 UI code generator 4.9
+# Created: Thu Mar 01 19:18:29 2012
+#      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
 
