@@ -17,7 +17,7 @@ class Config(object):
 
     def save(self):
         with open(self.configName, "wb") as fileConfig:
-            # self.serialDict = Config.serial.getSettingsDict()
+            self.serialDict = Config.serial.getSettingsDict()
             cPickle.dump(self.serialDict, fileConfig)
             Config.serial.applySettingsDict(self.serialDict)
 
