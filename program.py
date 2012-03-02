@@ -50,8 +50,6 @@ class MyDialog(QtGui.QDialog):
         self.ui.btn_close.clicked.connect(self.myConfig.serial.close)
         self.ui.btn_save.clicked.connect(self.save)
 
-        print list_ports.comports()
-
     def save(self):
         self.myConfig.serialDict['port'] = self.ui.i_portName_comboBox.currentIndex()
         self.myConfig.serialDict['baudrate'] = int(self.ui.i_baudRate_comboBox.currentText())
