@@ -15,7 +15,7 @@ class MyDialog(QtGui.QDialog):
 
         self.myConfig = Config()
 
-        self.protocolOptionDict = {'XOFF': 'xonxoff', 'DTR/DSR': 'dsrdtr', 'RTS/CTS': 'rtscts'}
+        self.protocolOptionDict = {'CTRL-S/CTRL-Q': 'xonxoff', 'DTR/DSR': 'dsrdtr', 'RTS/CTS': 'rtscts'}
         self.terminatorList = ['CR', 'LF', 'CR, LF', 'brak', u'własny']
         comPortsList = [portList[0] for portList in list_ports.comports()]
 
