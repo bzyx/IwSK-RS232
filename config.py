@@ -28,10 +28,12 @@ class Config(object):
 
 if __name__ == "__main__":
     configTest = Config()
-    print configTest.serial
-    configTest.save()
     configTest.load()
+    print configTest.serial
     print configTest.serialDict
+    # configTest.save()
+    # configTest.load()
+    # print configTest.serialDict
     # configTest.serial.baudrate = 19200
     # configTest.save()
     # del configTest

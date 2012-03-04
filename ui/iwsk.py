@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui\iwsk.ui'
 #
-# Created: Thu Mar 01 19:18:29 2012
+# Created: Sun Mar 04 19:14:38 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -46,9 +46,9 @@ class Ui_Dialog(object):
         self.label_5 = QtGui.QLabel(self.groupBox)
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.gridLayout.addWidget(self.label_5, 4, 0, 1, 1)
-        self.comboBox_3 = QtGui.QComboBox(self.groupBox)
-        self.comboBox_3.setObjectName(_fromUtf8("comboBox_3"))
-        self.gridLayout.addWidget(self.comboBox_3, 5, 2, 1, 1)
+        self.i_protocol_comboBox = QtGui.QComboBox(self.groupBox)
+        self.i_protocol_comboBox.setObjectName(_fromUtf8("i_protocol_comboBox"))
+        self.gridLayout.addWidget(self.i_protocol_comboBox, 5, 2, 1, 1)
         self.label_3 = QtGui.QLabel(self.groupBox)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.gridLayout.addWidget(self.label_3, 2, 0, 1, 1)
@@ -58,9 +58,9 @@ class Ui_Dialog(object):
         self.label_6 = QtGui.QLabel(self.groupBox)
         self.label_6.setObjectName(_fromUtf8("label_6"))
         self.gridLayout.addWidget(self.label_6, 5, 0, 1, 1)
-        self.comboBox_4 = QtGui.QComboBox(self.groupBox)
-        self.comboBox_4.setObjectName(_fromUtf8("comboBox_4"))
-        self.gridLayout.addWidget(self.comboBox_4, 6, 2, 1, 1)
+        self.i_terminator_comboBox = QtGui.QComboBox(self.groupBox)
+        self.i_terminator_comboBox.setObjectName(_fromUtf8("i_terminator_comboBox"))
+        self.gridLayout.addWidget(self.i_terminator_comboBox, 6, 2, 1, 1)
         self.label_7 = QtGui.QLabel(self.groupBox)
         self.label_7.setObjectName(_fromUtf8("label_7"))
         self.gridLayout.addWidget(self.label_7, 6, 0, 1, 1)
@@ -169,8 +169,8 @@ class Ui_Dialog(object):
         self.label_5.setBuddy(self.i_stopBit1_radio)
         self.label_3.setBuddy(self.i_word_5bits_radio)
         self.label_2.setBuddy(self.i_baudRate_comboBox)
-        self.label_6.setBuddy(self.comboBox_3)
-        self.label_7.setBuddy(self.comboBox_4)
+        self.label_6.setBuddy(self.i_protocol_comboBox)
+        self.label_7.setBuddy(self.i_terminator_comboBox)
         self.label_4.setBuddy(self.i_parityNone_radio)
         self.label_9.setBuddy(self.o_send_plainTextEdit)
         self.label_8.setBuddy(self.o_recived_plainTextEdit)

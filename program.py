@@ -15,6 +15,8 @@ class MyDialog(QtGui.QDialog):
 
         self.myConfig = Config()
 
+        self.protocolOptionDict = {'XOFF': 'xonxoff', 'DTR/DSR': 'dsrdtr', 'RTS/CTS': 'rtscts'}
+        self.terminatorList = ['CR', 'LF', 'CR, LF', 'brak', u'własny']
         comPortsList = [portList[0] for portList in list_ports.comports()]
 
         for baudRate in self.myConfig.serial.BAUDRATES:
@@ -22,6 +24,12 @@ class MyDialog(QtGui.QDialog):
 
         for port in comPortsList:
             self.ui.i_portName_comboBox.addItem(port)
+
+        for terminator in self.terminatorList:
+            self.ui.i_terminator_comboBox.addItem(terminator)
+
+        for protocol in self.protocolOptionDict.keys():
+            self.ui.i_protocol_comboBox.addItem(protocol)
 
         self.byteSizeList = [self.ui.i_word_5bits_radio, \
                 self.ui.i_word_6bits_radio, \
@@ -49,8 +57,20 @@ class MyDialog(QtGui.QDialog):
         self.ui.btn_open.clicked.connect(self.myConfig.serial.open)
         self.ui.btn_close.clicked.connect(self.myConfig.serial.close)
         self.ui.btn_save.clicked.connect(self.save)
+        self.ui.btn_clear_recived.clicked.connect(self.ui.o_recived_plainTextEdit.clear)
+        self.ui.btn_clear_send.clicked.connect(self.ui.o_send_plainTextEdit.clear)
+
+    def funkcja(self):
+        # TODO: change name function (funkcja) and supplemented
+        pass
 
     def save(self):
+        for clear in self.protocolOptionDict.values():
+            self.myConfig.serialDict[clear] = False
+
+        self.myConfig.serialDict[self.protocolOptionDict[\
+                str(self.ui.i_protocol_comboBox.currentText())]] = True
+
         self.myConfig.serialDict['port'] = self.ui.i_portName_comboBox.currentIndex()
         self.myConfig.serialDict['baudrate'] = int(self.ui.i_baudRate_comboBox.currentText())
         for byteSize in self.byteSizeList:
