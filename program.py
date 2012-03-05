@@ -61,10 +61,17 @@ class MyDialog(QtGui.QDialog):
         self.ui.btn_save.clicked.connect(self.save)
         self.ui.btn_clear_recived.clicked.connect(self.ui.o_recived_plainTextEdit.clear)
         self.ui.btn_clear_send.clicked.connect(self.ui.o_send_plainTextEdit.clear)
+        self.ui.btn_send.clicked.connect(self.send)
 
     def funkcja(self):
         # TODO: change name function (funkcja) and supplemented
         pass
+
+    def send(self):
+        sendText = self.ui.lineEdit.text()
+        Config.serial.write(sendText)
+        self.ui.o_send_plainTextEdit.appendPlainText(sendText)
+        self.ui.lineEdit.clear()
 
     def save(self):
         for clear in self.protocolOptionDict.values():
