@@ -5,12 +5,14 @@ S'N'
 sS'baudrate'
 p3
 I9600
+sS' '
+I00
 sS'bytesize'
 p4
 I8
 sS'xonxoff'
 p5
-I01
+I00
 sS'interCharTimeout'
 p6
 NsS'rtscts'
