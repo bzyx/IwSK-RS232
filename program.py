@@ -51,10 +51,16 @@ class MyDialog(QtGui.QDialog):
         byteSizeIndex = Config.serial.BYTESIZES.index(self.myConfig.serialDict['bytesize'])
         paritiesIndex = Config.serial.PARITIES.index(self.myConfig.serialDict['parity'])
         stopBitsIndex = Config.serial.STOPBITS.index(self.myConfig.serialDict['stopbits'])
+        timeoutConfigValue = self.myConfig.serialDict['timeout']
 
+        if timeoutConfigValue:
+            self.ui.i_timeout_spinBox.setValue(timeoutConfigValue)
         self.ui.i_baudRate_comboBox.setCurrentIndex(self.ui.i_baudRate_comboBox.\
                 findText(repr(self.myConfig.serialDict['baudrate'])))
-        self.ui.i_portName_comboBox.setCurrentIndex(self.myConfig.serialDict['port'])
+        try:
+            self.ui.i_portName_comboBox.setCurrentIndex(self.myConfig.serialDict['port'])
+        except KeyError:
+            self.ui.i_portName_comboBox.setCurrentIndex(0)
         self.byteSizeList[byteSizeIndex].setChecked(True)
         self.paritiesList[paritiesIndex].setChecked(True)
         self.stopBitsList[stopBitsIndex].setChecked(True)
@@ -109,6 +115,10 @@ class MyDialog(QtGui.QDialog):
         for stopBit in self.stopBitsList:
             if(stopBit.isChecked()):
                 self.myConfig.serialDict['stopbits'] = Config.serial.STOPBITS[self.stopBitsList.index(stopBit)]
+        if self.ui.i_timeout_spinBox.value():
+            self.myConfig.serialDict['timeout'] = self.ui.i_timeout_spinBox.value()
+        else:
+            self.myConfig.serialDict['timeout'] = None
         self.myConfig.save()
 
 if __name__ == "__main__":
