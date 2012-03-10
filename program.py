@@ -55,10 +55,12 @@ class MyDialog(QtGui.QDialog):
 
         if timeoutConfigValue:
             self.ui.i_timeout_spinBox.setValue(timeoutConfigValue)
+
         self.ui.i_baudRate_comboBox.setCurrentIndex(self.ui.i_baudRate_comboBox.\
                 findText(repr(self.myConfig.serialDict['baudrate'])))
         try:
             self.ui.i_portName_comboBox.setCurrentIndex(self.myConfig.serialDict['port'])
+            self.ui.i_automaticTerminator_checkBox.setChecked(self.myConfig.serialDict['automaticTerminator'])
         except KeyError:
             self.ui.i_portName_comboBox.setCurrentIndex(0)
         self.byteSizeList[byteSizeIndex].setChecked(True)
@@ -119,6 +121,7 @@ class MyDialog(QtGui.QDialog):
             self.myConfig.serialDict['timeout'] = self.ui.i_timeout_spinBox.value()
         else:
             self.myConfig.serialDict['timeout'] = None
+        self.myConfig.serialDict['automaticTerminator'] = self.ui.i_automaticTerminator_checkBox.isChecked()
         self.myConfig.save()
 
 if __name__ == "__main__":
