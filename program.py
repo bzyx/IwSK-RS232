@@ -78,7 +78,8 @@ class MyDialog(QtGui.QDialog):
             self.bufferRecived = Config.serial.read(Config.serial.inWaiting())
             self.ui.o_recived_plainTextEdit.appendPlainText(self.bufferRecived)
             if re.search(r'^p<[0-2][0-9](:[0-5][0-9]){2}>!$', self.bufferRecived):
-                Config.serial.write('ping sukces!')
+                sendRecivePing = "rp<%s>!" % (time.strftime('%X'))
+                Config.serial.write(sendRecivePing)
 
     def ping(self):
         sendPing = "p<%s>!" % (time.strftime('%X'))
