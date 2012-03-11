@@ -7,6 +7,7 @@ from config import Config
 from serial.tools import list_ports
 import time
 import re
+import collections
 
 
 # TODO: add automatic terminator option
@@ -17,9 +18,11 @@ class MyDialog(QtGui.QDialog):
         self.ui.setupUi(self)
 
         self.myConfig = Config()
-
+        self.sendTextBuffor = ''
         self.protocolOptionDict = {'Brak': ' ', 'CTRL-S/CTRL-Q': 'xonxoff', 'DTR/DSR': 'dsrdtr', 'RTS/CTS': 'rtscts'}
-        self.terminatorList = ['CR', 'LF', 'CR, LF', 'brak', u'własny']
+        self.terminatorList = collections.OrderedDict([('CR', chr(13)), ('LF', chr(10)),  \
+                ('CR, LF', chr(13) + chr(10)), ('brak', ''), (u'własny', '')])    # acii 10 -LF 13 -CR
+
         comPortsList = [portList[0] for portList in list_ports.comports()]
         self.recivedTimer = QtCore.QTimer(self)
 
@@ -29,7 +32,7 @@ class MyDialog(QtGui.QDialog):
         for port in comPortsList:
             self.ui.i_portName_comboBox.addItem(port)
 
-        for terminator in self.terminatorList:
+        for terminator in self.terminatorList.keys():
             self.ui.i_terminator_comboBox.addItem(terminator)
 
         for protocol in self.protocolOptionDict.keys():
@@ -58,11 +61,14 @@ class MyDialog(QtGui.QDialog):
 
         self.ui.i_baudRate_comboBox.setCurrentIndex(self.ui.i_baudRate_comboBox.\
                 findText(repr(self.myConfig.serialDict['baudrate'])))
-        try:
-            self.ui.i_portName_comboBox.setCurrentIndex(self.myConfig.serialDict['port'])
-            self.ui.i_automaticTerminator_checkBox.setChecked(self.myConfig.serialDict['automaticTerminator'])
-        except KeyError:
-            self.ui.i_portName_comboBox.setCurrentIndex(0)
+        # nie zrobic tego w configu??
+        self.ui.i_terminator_comboBox.setCurrentIndex(self.ui.i_terminator_comboBox.\
+                findText(self.myConfig.serialDict.get('terminator', 'CR')))
+        # try:
+        self.ui.i_portName_comboBox.setCurrentIndex(self.myConfig.serialDict.get('port', 0))
+        self.ui.i_automaticTerminator_checkBox.setChecked(self.myConfig.serialDict.get('automaticTerminator', True))
+        # except KeyError:
+        #     self.ui.i_portName_comboBox.setCurrentIndex(0)
         self.byteSizeList[byteSizeIndex].setChecked(True)
         self.paritiesList[paritiesIndex].setChecked(True)
         self.stopBitsList[stopBitsIndex].setChecked(True)
@@ -94,10 +100,29 @@ class MyDialog(QtGui.QDialog):
         Config.serial.write(sendPing)
 
     def send(self):
-        sendText = self.ui.lineEdit.text()
-        Config.serial.write(sendText)
-        self.ui.o_send_plainTextEdit.appendPlainText(sendText)
+        sendText = str(self.ui.lineEdit.text())
+        if self.myConfig.serialDict.get('automaticTerminator', True):
+            sendText.append(self.terminatorList[self.i_terminator_comboBox.currentText()])
+            Config.serial.write(sendText)
+            self.ui.o_send_plainTextEdit.appendPlainText(sendText)
+        else:
+            sendText, isTerminator = self.searchTerminator(sendText)
+            print sendText, isTerminator
+            self.sendTextBuffor += sendText
+            if isTerminator:
+                self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
+                Config.serial.write(self.sendTextBuffor)
+                self.sendTextBuffor = ''
         self.ui.lineEdit.clear()
+
+    def searchTerminator(self, text):
+        terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', u'CR')]
+        print terminator
+        indexFind = text.find(repr(terminator)[1:-1])
+        if indexFind == -1:
+            return (text, False)
+        else:
+            return (text[:indexFind], True)
 
     def save(self):
         for clear in self.protocolOptionDict.values():
@@ -122,6 +147,7 @@ class MyDialog(QtGui.QDialog):
         else:
             self.myConfig.serialDict['timeout'] = None
         self.myConfig.serialDict['automaticTerminator'] = self.ui.i_automaticTerminator_checkBox.isChecked()
+        self.myConfig.serialDict['terminator'] = str(self.ui.i_terminator_comboBox.currentText())
         self.myConfig.save()
 
 if __name__ == "__main__":

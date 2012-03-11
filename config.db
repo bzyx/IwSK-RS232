@@ -15,7 +15,7 @@ p5
 I00
 sS'automaticTerminator'
 p6
-I01
+I00
 sS'interCharTimeout'
 p7
 NsS'rtscts'
@@ -33,5 +33,9 @@ sS'writeTimeout'
 p12
 NsS'port'
 p13
-I0
+I2
+sS'terminator'
+p14
+S'CR'
+p15
 s.
