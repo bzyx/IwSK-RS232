@@ -67,6 +67,9 @@ class MyDialog(QtGui.QDialog):
         # try:
         self.ui.i_portName_comboBox.setCurrentIndex(self.myConfig.serialDict.get('port', 0))
         self.ui.i_automaticTerminator_checkBox.setChecked(self.myConfig.serialDict.get('automaticTerminator', True))
+        if unicode(self.ui.i_terminator_comboBox.currentText()) == u"własny":
+            self.ui.i_itsTerminator_lineEdit.setText(self.myConfig.serialDict.get('itsTerminator', ''))
+            self.ui.i_howMuchChars_spinBox.setValue(len(str(self.ui.i_itsTerminator_lineEdit.text())))
         # except KeyError:
         #     self.ui.i_portName_comboBox.setCurrentIndex(0)
         self.byteSizeList[byteSizeIndex].setChecked(True)
@@ -75,54 +78,79 @@ class MyDialog(QtGui.QDialog):
         self.bufferRecived = ' '
 
         self.ui.btn_open.clicked.connect(self.openPort)
-        self.ui.btn_close.clicked.connect(Config.serial.close)
+        self.ui.btn_close.clicked.connect(self.closePort)
         self.ui.btn_save.clicked.connect(self.save)
         self.ui.btn_clear_recived.clicked.connect(self.ui.o_recived_plainTextEdit.clear)
         self.ui.btn_clear_send.clicked.connect(self.ui.o_send_plainTextEdit.clear)
         self.ui.btn_send.clicked.connect(self.send)
         self.ui.btn_pingFunction.clicked.connect(self.ping)
+        # self.ui.i_howMuchChars_spinBox.valueChanged(int).connect(self.changedSizeTerminator)
+        QtCore.QObject.connect(self.ui.i_howMuchChars_spinBox, QtCore.SIGNAL("valueChanged(int)"), self.changedSizeTerminator)
         self.recivedTimer.timeout.connect(self.recived)
+
+    def changedSizeTerminator(self, howMuch):
+        self.ui.i_itsTerminator_lineEdit.setMaxLength(howMuch)
 
     def openPort(self):
         Config.serial.open()
         self.recivedTimer.start(1000)
 
+    def closePort(self):
+        self.recivedTimer.stop()
+        Config.serial.close()
+
     def recived(self):
         if  Config.serial.inWaiting():
-            self.bufferRecived = Config.serial.read(Config.serial.inWaiting())
-            self.ui.o_recived_plainTextEdit.appendPlainText(self.bufferRecived)
-            if re.search(r'^p<[0-2][0-9](:[0-5][0-9]){2}>!$', self.bufferRecived):
-                sendRecivePing = "rp<%s>!" % (time.strftime('%X'))
-                Config.serial.write(sendRecivePing)
+            print "jestem"
+            recivedText = Config.serial.read(Config.serial.inWaiting())
+            self.bufferRecived += recivedText
+            print repr(self.bufferRecived)
+            self.bufferRecived, isTerminator = self.searchTerminator(self.bufferRecived)
+            print repr(self.bufferRecived)
+            if isTerminator:
+                self.ui.o_recived_plainTextEdit.appendPlainText(self.bufferRecived)
+                if re.search(r'^ ?p<[0-2][0-9](:[0-5][0-9]){2}>!$', self.bufferRecived):
+                    print 'jest'
+                    sendRecivePing = "rp<%s>!" % (time.strftime('%X'))
+                    print repr(sendRecivePing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
+                    Config.serial.write(sendRecivePing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
+                self.bufferRecived = ''
 
     def ping(self):
         sendPing = "p<%s>!" % (time.strftime('%X'))
-        Config.serial.write(sendPing)
+        Config.serial.write(sendPing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
 
     def send(self):
+        terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')]
         sendText = str(self.ui.lineEdit.text())
         if self.myConfig.serialDict.get('automaticTerminator', True):
-            sendText.append(self.terminatorList[self.i_terminator_comboBox.currentText()])
+            sendText += terminator
             Config.serial.write(sendText)
+            sendText, isTerminator = self.searchTerminator(sendText)
             self.ui.o_send_plainTextEdit.appendPlainText(sendText)
         else:
             sendText, isTerminator = self.searchTerminator(sendText)
-            print sendText, isTerminator
             self.sendTextBuffor += sendText
             if isTerminator:
                 self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
-                Config.serial.write(self.sendTextBuffor)
+                Config.serial.write(self.sendTextBuffor + terminator)
                 self.sendTextBuffor = ''
         self.ui.lineEdit.clear()
 
     def searchTerminator(self, text):
-        terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', u'CR')]
-        print terminator
-        indexFind = text.find(repr(terminator)[1:-1])
-        if indexFind == -1:
-            return (text, False)
+        terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')]
+
+        if terminator in text:
+            indexFind = True
+        elif ("%s" % repr(terminator)[1:-1]) in text:
+            terminator = "%s" % repr(terminator)[1:-1]
+            terminator = repr(terminator)[1:-1]
+            indexFind = True
         else:
-            return (text[:indexFind], True)
+            indexFind = False
+
+        text = re.split(terminator, text)[0]
+        return (text, indexFind)
 
     def save(self):
         for clear in self.protocolOptionDict.values():
@@ -147,7 +175,10 @@ class MyDialog(QtGui.QDialog):
         else:
             self.myConfig.serialDict['timeout'] = None
         self.myConfig.serialDict['automaticTerminator'] = self.ui.i_automaticTerminator_checkBox.isChecked()
-        self.myConfig.serialDict['terminator'] = str(self.ui.i_terminator_comboBox.currentText())
+        self.myConfig.serialDict['terminator'] = unicode(self.ui.i_terminator_comboBox.currentText())
+        if unicode(self.ui.i_terminator_comboBox.currentText()) == u"własny":
+            self.myConfig.serialDict['itsTerminator'] = str(self.ui.i_itsTerminator_lineEdit.text())
+            self.terminatorList[u'własny'] = self.myConfig.serialDict['itsTerminator']
         self.myConfig.save()
 
 if __name__ == "__main__":

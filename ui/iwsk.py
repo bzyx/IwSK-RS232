@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui\iwsk.ui'
 #
-# Created: Sat Mar 10 20:46:47 2012
+# Created: Sun Mar 11 14:25:54 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -194,26 +194,26 @@ class Ui_Dialog(object):
         self.horizontalLayout_7.setSizeConstraint(QtGui.QLayout.SetNoConstraint)
         self.horizontalLayout_7.setContentsMargins(-1, -1, 30, -1)
         self.horizontalLayout_7.setObjectName(_fromUtf8("horizontalLayout_7"))
-        self.spinBox_2 = QtGui.QSpinBox(self.tab_2)
+        self.i_howMuchChars_spinBox = QtGui.QSpinBox(self.tab_2)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.spinBox_2.sizePolicy().hasHeightForWidth())
-        self.spinBox_2.setSizePolicy(sizePolicy)
-        self.spinBox_2.setMinimum(1)
-        self.spinBox_2.setMaximum(2)
-        self.spinBox_2.setObjectName(_fromUtf8("spinBox_2"))
-        self.horizontalLayout_7.addWidget(self.spinBox_2)
-        self.lineEdit_2 = QtGui.QLineEdit(self.tab_2)
+        sizePolicy.setHeightForWidth(self.i_howMuchChars_spinBox.sizePolicy().hasHeightForWidth())
+        self.i_howMuchChars_spinBox.setSizePolicy(sizePolicy)
+        self.i_howMuchChars_spinBox.setMinimum(1)
+        self.i_howMuchChars_spinBox.setMaximum(2)
+        self.i_howMuchChars_spinBox.setObjectName(_fromUtf8("i_howMuchChars_spinBox"))
+        self.horizontalLayout_7.addWidget(self.i_howMuchChars_spinBox)
+        self.i_itsTerminator_lineEdit = QtGui.QLineEdit(self.tab_2)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lineEdit_2.sizePolicy().hasHeightForWidth())
-        self.lineEdit_2.setSizePolicy(sizePolicy)
-        self.lineEdit_2.setText(_fromUtf8(""))
-        self.lineEdit_2.setMaxLength(1)
-        self.lineEdit_2.setObjectName(_fromUtf8("lineEdit_2"))
-        self.horizontalLayout_7.addWidget(self.lineEdit_2)
+        sizePolicy.setHeightForWidth(self.i_itsTerminator_lineEdit.sizePolicy().hasHeightForWidth())
+        self.i_itsTerminator_lineEdit.setSizePolicy(sizePolicy)
+        self.i_itsTerminator_lineEdit.setText(_fromUtf8(""))
+        self.i_itsTerminator_lineEdit.setMaxLength(1)
+        self.i_itsTerminator_lineEdit.setObjectName(_fromUtf8("i_itsTerminator_lineEdit"))
+        self.horizontalLayout_7.addWidget(self.i_itsTerminator_lineEdit)
         self.gridLayout_3.addLayout(self.horizontalLayout_7, 8, 1, 1, 1)
         self.label_13 = QtGui.QLabel(self.tab_2)
         self.label_13.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
