@@ -19,7 +19,7 @@ class MyDialog(QtGui.QDialog):
 
         self.myConfig = Config()
         self.sendTextBuffor = ''
-        self.protocolOptionDict = {'Brak': ' ', 'CTRL-S/CTRL-Q': 'xonxoff', 'DTR/DSR': 'dsrdtr', 'RTS/CTS': 'rtscts'}
+        self.protocolOptionDict = {'Brak': ' ', 'CTRL-S/CTRL-Q': 'xonxoff', 'DSR/DTR': 'dsrdtr', 'RTS/CTS': 'rtscts'}
         self.terminatorList = collections.OrderedDict([('CR', chr(13)), ('LF', chr(10)),  \
                 ('CR, LF', chr(13) + chr(10)), ('brak', ''), (u'własny', '')])    # acii 10 -LF 13 -CR
 
@@ -64,6 +64,9 @@ class MyDialog(QtGui.QDialog):
         # nie zrobic tego w configu??
         self.ui.i_terminator_comboBox.setCurrentIndex(self.ui.i_terminator_comboBox.\
                 findText(self.myConfig.serialDict.get('terminator', 'CR')))
+        # protocolSet = lambda lista:
+        # self.ui.i_protocol_comboBox.setCurrentIndex(self.ui.i_protocol_comboBox.\
+        #         findText(self.myConfig.serialDict.get('p
         # try:
         self.ui.i_portName_comboBox.setCurrentIndex(self.myConfig.serialDict.get('port', 0))
         self.ui.i_automaticTerminator_checkBox.setChecked(self.myConfig.serialDict.get('automaticTerminator', True))
@@ -76,6 +79,15 @@ class MyDialog(QtGui.QDialog):
         self.paritiesList[paritiesIndex].setChecked(True)
         self.stopBitsList[stopBitsIndex].setChecked(True)
         self.bufferRecived = ' '
+        if self.myConfig.serialDict['dsrdtr']:
+            protocolIndex = 2
+        elif self.myConfig.serialDict['rtscts']:
+            protocolIndex = 3
+        elif self.myConfig.serialDict['xonxoff']:
+            protocolIndex = 1
+        else:
+            protocolIndex = 0
+        self.ui.i_protocol_comboBox.setCurrentIndex(protocolIndex)
 
         self.ui.btn_open.clicked.connect(self.openPort)
         self.ui.btn_close.clicked.connect(self.closePort)
@@ -88,11 +100,29 @@ class MyDialog(QtGui.QDialog):
         QtCore.QObject.connect(self.ui.i_howMuchChars_spinBox, QtCore.SIGNAL("valueChanged(int)"), self.changedSizeTerminator)
         self.recivedTimer.timeout.connect(self.recived)
 
+    def dtrRts(self):
+        Config.serial.setRTS(False)
+        Config.serial.setDTR(False)
+        if Config.serial.dsrdtr:
+            print "jeden"
+            self.dtrRtsWrite = Config.serial.setDTR
+        elif Config.serial.rtscts:
+            print "dwa"
+            self.dtrRtsWrite = Config.serial.setRTS
+        elif Config.serial.xonxoff:
+            print "trzy"
+            self.dtrRtsWrite = Config.serial.setXON
+        else:
+            self.dtrRtsWrite = lambda tekst: tekst
+
     def changedSizeTerminator(self, howMuch):
         self.ui.i_itsTerminator_lineEdit.setMaxLength(howMuch)
 
     def openPort(self):
         Config.serial.open()
+        self.dtrRts()
+        self.dtrRtsWrite(True)
+        # self.dtrRtsWrite(True)
         self.recivedTimer.start(1000)
 
     def closePort(self):
@@ -100,17 +130,18 @@ class MyDialog(QtGui.QDialog):
         Config.serial.close()
 
     def recived(self):
+        # TODO: ogarnac xonxoff
+        # xonxoff = False
+        print Config.serial.getCTS(), Config.serial.getDSR(), Config.serial.getRtsCts(), Config.serial.getRtsToggle()
         if  Config.serial.inWaiting():
-            print "jestem"
             recivedText = Config.serial.read(Config.serial.inWaiting())
+            # if recivedText.find(
             self.bufferRecived += recivedText
-            print repr(self.bufferRecived)
             self.bufferRecived, isTerminator = self.searchTerminator(self.bufferRecived)
             print repr(self.bufferRecived)
             if isTerminator:
                 self.ui.o_recived_plainTextEdit.appendPlainText(self.bufferRecived)
                 if re.search(r'^ ?p<[0-2][0-9](:[0-5][0-9]){2}>!$', self.bufferRecived):
-                    print 'jest'
                     sendRecivePing = "rp<%s>!" % (time.strftime('%X'))
                     print repr(sendRecivePing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
                     Config.serial.write(sendRecivePing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
@@ -121,21 +152,24 @@ class MyDialog(QtGui.QDialog):
         Config.serial.write(sendPing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
 
     def send(self):
-        terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')]
-        sendText = str(self.ui.lineEdit.text())
-        if self.myConfig.serialDict.get('automaticTerminator', True):
-            sendText += terminator
-            Config.serial.write(sendText)
-            sendText, isTerminator = self.searchTerminator(sendText)
-            self.ui.o_send_plainTextEdit.appendPlainText(sendText)
-        else:
-            sendText, isTerminator = self.searchTerminator(sendText)
-            self.sendTextBuffor += sendText
-            if isTerminator:
-                self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
-                Config.serial.write(self.sendTextBuffor + terminator)
-                self.sendTextBuffor = ''
-        self.ui.lineEdit.clear()
+        if Config.serial.getDSR() or Config.serial.getCTS() or Config.serial.xonxoff:
+            # self.dtrRtsWrite(False)
+            terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')]
+            sendText = str(self.ui.lineEdit.text())
+            if self.myConfig.serialDict.get('automaticTerminator', True):
+                sendText += terminator
+                Config.serial.write(sendText)
+                sendText, isTerminator = self.searchTerminator(sendText)
+                self.ui.o_send_plainTextEdit.appendPlainText(sendText)
+            else:
+                sendText, isTerminator = self.searchTerminator(sendText)
+                self.sendTextBuffor += sendText
+                if isTerminator:
+                    self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
+                    Config.serial.write(self.sendTextBuffor + terminator)
+                    self.sendTextBuffor = ''
+            self.ui.lineEdit.clear()
+            # self.dtrRtsWrite(True)
 
     def searchTerminator(self, text):
         terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')]
@@ -155,7 +189,7 @@ class MyDialog(QtGui.QDialog):
     def save(self):
         for clear in self.protocolOptionDict.values():
             self.myConfig.serialDict[clear] = False
-        if(self.ui.i_protocol_comboBox.currentIndex() != 0):
+        if self.ui.i_protocol_comboBox.currentIndex() != 0:
             self.myConfig.serialDict[self.protocolOptionDict[\
                     str(self.ui.i_protocol_comboBox.currentText())]] = True
 
