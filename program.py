@@ -2,12 +2,14 @@
 import sys
 
 from PyQt4 import QtGui, QtCore
-from ui.iwsk import Ui_Dialog
-from config import Config
+from collections import OrderedDict
 from serial.tools import list_ports
+
 import time
 import re
-import collections
+
+from config import Config
+from ui.iwsk import Ui_Dialog
 
 
 # TODO: add automatic terminator option
@@ -18,50 +20,84 @@ class MyDialog(QtGui.QDialog):
         self.ui.setupUi(self)
 
         self.myConfig = Config()
+        # bufor na tekst do wysłania
         self.sendTextBuffor = ''
+        
+        # bufor na wartości odczytane
+        self.bufferRecived = ' '
+        # Opcje wyboru sterowania magistrali
         self.protocolOptionDict = {'Brak': ' ', 'CTRL-S/CTRL-Q': 'xonxoff', 'DSR/DTR': 'dsrdtr', 'RTS/CTS': 'rtscts'}
-        self.terminatorList = collections.OrderedDict([('CR', chr(13)), ('LF', chr(10)),  \
-                ('CR, LF', chr(13) + chr(10)), ('brak', ''), (u'własny', '')])    # acii 10 -LF 13 -CR
+        # Terminatory standardowe + terminator w�asny
+        # ASCII 10 -LF 13 -CR
+        self.treminatorTypes = OrderedDict([('CR', chr(13)), ('LF', chr(10)), \
+                                                       ('CR, LF', chr(13) + chr(10)), \
+                                                       ('brak', ''), \
+                                                       (u'własny', '')])    
 
+        # Tworzymy lista dostępnych w systemie portów COM
         comPortsList = [portList[0] for portList in list_ports.comports()]
+        
+        #Timmer do odbioru danych/powoduje zap�tlenie programu
         self.recivedTimer = QtCore.QTimer(self)
+        
+        
+        
+        # Połączenie sygnałów/slotów - wewnętrzne sprawy Qt
+        self.ui.btn_open.clicked.connect(self.openPort)
+        self.ui.btn_close.clicked.connect(self.closePort)
+        self.ui.btn_save.clicked.connect(self.save)
+        self.ui.btn_clear_recived.clicked.connect(self.ui.o_recived_plainTextEdit.clear)
+        self.ui.btn_clear_send.clicked.connect(self.ui.o_send_plainTextEdit.clear)
+        self.ui.btn_send.clicked.connect(self.send)
+        self.ui.btn_pingFunction.clicked.connect(self.ping)
+        # self.ui.i_howMuchChars_spinBox.valueChanged(int).connect(self.changedSizeTerminator)
+        QtCore.QObject.connect(self.ui.i_howMuchChars_spinBox, QtCore.SIGNAL("valueChanged(int)"), self.changedSizeTerminator)
+        self.recivedTimer.timeout.connect(self.recived)        
+        self.ui.i_terminator_comboBox.currentIndexChanged[str].connect(self.terminatorChanged)
 
+        # Tworzenie listy obsługiwanych wartości szybkości transmisji
         for baudRate in Config.serial.BAUDRATES:
             self.ui.i_baudRate_comboBox.addItem(repr(baudRate))
 
+        # Tworzenie listy dostępnych portów COM - dla intefejsu użytkownika
         for port in comPortsList:
             self.ui.i_portName_comboBox.addItem(port)
-
-        for terminator in self.terminatorList.keys():
+        
+        # Dodajemy możliwe typy terminatora
+        for terminator in self.treminatorTypes.keys():
             self.ui.i_terminator_comboBox.addItem(terminator)
 
+        # Dodajemy listę typów sterowania transmisją 
         for protocol in self.protocolOptionDict.keys():
             self.ui.i_protocol_comboBox.addItem(protocol)
 
+        # Tworzymy listy obiektów intefejsu użytkownika
+        # reprezentująch parametry transmisji. 
+        # W celu ułatwienia zarz�dzania transmisją.
+        # Długś słowa
         self.byteSizeList = [self.ui.i_word_5bits_radio, \
                 self.ui.i_word_6bits_radio, \
                 self.ui.i_word_7bits_radio, \
                 self.ui.i_word_8bits_radio]
 
+        # Parzystość
         self.paritiesList = [self.ui.i_parityNone_radio, \
                 self.ui.i_parityEven_radio, \
                 self.ui.i_parityOdd_radio]
 
+        # Liczba bitiów stopu
         self.stopBitsList = [self.ui.i_stopBit1_radio, \
                 self.ui.i_stopBit15_radio, \
                 self.ui.i_stopBit2_radio]
 
-        byteSizeIndex = Config.serial.BYTESIZES.index(self.myConfig.serialDict['bytesize'])
-        paritiesIndex = Config.serial.PARITIES.index(self.myConfig.serialDict['parity'])
-        stopBitsIndex = Config.serial.STOPBITS.index(self.myConfig.serialDict['stopbits'])
+        # Wczytujemy dane z poprzedniej konfiguracji jeśli taka była
         timeoutConfigValue = self.myConfig.serialDict['timeout']
 
+        # Aktualizujemy interfejs użytkownika wczytanymi wartośćiami
         if timeoutConfigValue:
             self.ui.i_timeout_spinBox.setValue(timeoutConfigValue)
-
         self.ui.i_baudRate_comboBox.setCurrentIndex(self.ui.i_baudRate_comboBox.\
                 findText(repr(self.myConfig.serialDict['baudrate'])))
-        # nie zrobic tego w configu??
         self.ui.i_terminator_comboBox.setCurrentIndex(self.ui.i_terminator_comboBox.\
                 findText(self.myConfig.serialDict.get('terminator', 'CR')))
         # protocolSet = lambda lista:
@@ -75,10 +111,17 @@ class MyDialog(QtGui.QDialog):
             self.ui.i_howMuchChars_spinBox.setValue(len(str(self.ui.i_itsTerminator_lineEdit.text())))
         # except KeyError:
         #     self.ui.i_portName_comboBox.setCurrentIndex(0)
+        
+        # Odczytanie i ustwienie wybranej wartości długości słowa, parzystości, liczby bitów stopu
+        byteSizeIndex = Config.serial.BYTESIZES.index(self.myConfig.serialDict['bytesize'])
+        paritiesIndex = Config.serial.PARITIES.index(self.myConfig.serialDict['parity'])
+        stopBitsIndex = Config.serial.STOPBITS.index(self.myConfig.serialDict['stopbits'])
+        
         self.byteSizeList[byteSizeIndex].setChecked(True)
         self.paritiesList[paritiesIndex].setChecked(True)
         self.stopBitsList[stopBitsIndex].setChecked(True)
-        self.bufferRecived = ' '
+        
+        # Odczytanie i ustawienie wartości o sposobie zarządzania transmisją
         if self.myConfig.serialDict['dsrdtr']:
             protocolIndex = 2
         elif self.myConfig.serialDict['rtscts']:
@@ -89,16 +132,6 @@ class MyDialog(QtGui.QDialog):
             protocolIndex = 0
         self.ui.i_protocol_comboBox.setCurrentIndex(protocolIndex)
 
-        self.ui.btn_open.clicked.connect(self.openPort)
-        self.ui.btn_close.clicked.connect(self.closePort)
-        self.ui.btn_save.clicked.connect(self.save)
-        self.ui.btn_clear_recived.clicked.connect(self.ui.o_recived_plainTextEdit.clear)
-        self.ui.btn_clear_send.clicked.connect(self.ui.o_send_plainTextEdit.clear)
-        self.ui.btn_send.clicked.connect(self.send)
-        self.ui.btn_pingFunction.clicked.connect(self.ping)
-        # self.ui.i_howMuchChars_spinBox.valueChanged(int).connect(self.changedSizeTerminator)
-        QtCore.QObject.connect(self.ui.i_howMuchChars_spinBox, QtCore.SIGNAL("valueChanged(int)"), self.changedSizeTerminator)
-        self.recivedTimer.timeout.connect(self.recived)
 
     def dtrRts(self):
         Config.serial.setRTS(False)
@@ -115,20 +148,26 @@ class MyDialog(QtGui.QDialog):
         else:
             self.dtrRtsWrite = lambda tekst: tekst
 
+    @QtCore.pyqtSlot()
     def changedSizeTerminator(self, howMuch):
         self.ui.i_itsTerminator_lineEdit.setMaxLength(howMuch)
-
+        
+    @QtCore.pyqtSlot()
     def openPort(self):
         Config.serial.open()
         self.dtrRts()
         self.dtrRtsWrite(True)
         # self.dtrRtsWrite(True)
         self.recivedTimer.start(1000)
+        print "Port Opened"
 
+    @QtCore.pyqtSlot()
     def closePort(self):
         self.recivedTimer.stop()
         Config.serial.close()
+        print "Port Closed"
 
+    @QtCore.pyqtSlot()
     def recived(self):
         # TODO: ogarnac xonxoff
         # xonxoff = False
@@ -143,18 +182,30 @@ class MyDialog(QtGui.QDialog):
                 self.ui.o_recived_plainTextEdit.appendPlainText(self.bufferRecived)
                 if re.search(r'^ ?p<[0-2][0-9](:[0-5][0-9]){2}>!$', self.bufferRecived):
                     sendRecivePing = "rp<%s>!" % (time.strftime('%X'))
-                    print repr(sendRecivePing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
-                    Config.serial.write(sendRecivePing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
+                    print repr(sendRecivePing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
+                    Config.serial.write(sendRecivePing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
                 self.bufferRecived = ''
 
+    @QtCore.pyqtSlot(str)
+    def terminatorChanged(self, itemName):
+        shouldShow = False
+        if itemName == u"własny":
+            shouldShow = True
+            
+        self.ui.i_howMuchChars_spinBox.setVisible(shouldShow)
+        self.ui.i_itsTerminator_lineEdit.setVisible(shouldShow)
+        self.ui.customTermator.setVisible(shouldShow)
+
+    @QtCore.pyqtSlot()
     def ping(self):
         sendPing = "p<%s>!" % (time.strftime('%X'))
-        Config.serial.write(sendPing + self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')])
+        Config.serial.write(sendPing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
 
+    @QtCore.pyqtSlot()
     def send(self):
         if Config.serial.getDSR() or Config.serial.getCTS() or Config.serial.xonxoff:
             # self.dtrRtsWrite(False)
-            terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')]
+            terminator = self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')]
             sendText = str(self.ui.lineEdit.text())
             if self.myConfig.serialDict.get('automaticTerminator', True):
                 sendText += terminator
@@ -172,7 +223,7 @@ class MyDialog(QtGui.QDialog):
             # self.dtrRtsWrite(True)
 
     def searchTerminator(self, text):
-        terminator = self.terminatorList[self.myConfig.serialDict.get('terminator', 'CR')]
+        terminator = self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')]
 
         if terminator in text:
             indexFind = True
@@ -185,8 +236,12 @@ class MyDialog(QtGui.QDialog):
 
         text = re.split(terminator, text)[0]
         return (text, indexFind)
-
+    
+    @QtCore.pyqtSlot()
     def save(self):
+        if Config.serial.isOpen():
+            QtGui.QMessageBox.warning(None, u"RS-232", u"Należy zamknąć i otworzyć port, aby zmiany zostały wporawdzone.", \
+                                      buttons=QtGui.QMessageBox.Ok, defaultButton=QtGui.QMessageBox.NoButton)
         for clear in self.protocolOptionDict.values():
             self.myConfig.serialDict[clear] = False
         if self.ui.i_protocol_comboBox.currentIndex() != 0:
@@ -212,7 +267,7 @@ class MyDialog(QtGui.QDialog):
         self.myConfig.serialDict['terminator'] = unicode(self.ui.i_terminator_comboBox.currentText())
         if unicode(self.ui.i_terminator_comboBox.currentText()) == u"własny":
             self.myConfig.serialDict['itsTerminator'] = str(self.ui.i_itsTerminator_lineEdit.text())
-            self.terminatorList[u'własny'] = self.myConfig.serialDict['itsTerminator']
+            self.treminatorTypes[u'własny'] = self.myConfig.serialDict['itsTerminator']
         self.myConfig.save()
 
 if __name__ == "__main__":

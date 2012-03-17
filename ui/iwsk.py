@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui\iwsk.ui'
 #
-# Created: Sun Mar 11 14:25:54 2012
-#      by: PyQt4 UI code generator 4.9.1
+# Created: Sat Mar 17 20:17:03 2012
+#      by: PyQt4 UI code generator 4.9
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -215,10 +215,9 @@ class Ui_Dialog(object):
         self.i_itsTerminator_lineEdit.setObjectName(_fromUtf8("i_itsTerminator_lineEdit"))
         self.horizontalLayout_7.addWidget(self.i_itsTerminator_lineEdit)
         self.gridLayout_3.addLayout(self.horizontalLayout_7, 8, 1, 1, 1)
-        self.label_13 = QtGui.QLabel(self.tab_2)
-        self.label_13.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.label_13.setObjectName(_fromUtf8("label_13"))
-        self.gridLayout_3.addWidget(self.label_13, 8, 0, 1, 1)
+        self.customTermator = QtGui.QLabel(self.tab_2)
+        self.customTermator.setObjectName(_fromUtf8("customTermator"))
+        self.gridLayout_3.addWidget(self.customTermator, 8, 0, 1, 1)
         self.i_automaticTerminator_checkBox = QtGui.QCheckBox(self.tab_2)
         self.i_automaticTerminator_checkBox.setChecked(True)
         self.i_automaticTerminator_checkBox.setObjectName(_fromUtf8("i_automaticTerminator_checkBox"))
@@ -248,10 +247,39 @@ class Ui_Dialog(object):
         self.label_5.setBuddy(self.i_stopBit1_radio)
         self.label_6.setBuddy(self.i_protocol_comboBox)
         self.label_7.setBuddy(self.i_terminator_comboBox)
+        self.label_11.setBuddy(self.i_timeout_spinBox)
 
         self.retranslateUi(Dialog)
         self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
+        Dialog.setTabOrder(self.i_portName_comboBox, self.o_recived_plainTextEdit)
+        Dialog.setTabOrder(self.o_recived_plainTextEdit, self.o_send_plainTextEdit)
+        Dialog.setTabOrder(self.o_send_plainTextEdit, self.btn_pingFunction)
+        Dialog.setTabOrder(self.btn_pingFunction, self.lineEdit)
+        Dialog.setTabOrder(self.lineEdit, self.btn_send)
+        Dialog.setTabOrder(self.btn_send, self.btn_clear_send)
+        Dialog.setTabOrder(self.btn_clear_send, self.btn_clear_recived)
+        Dialog.setTabOrder(self.btn_clear_recived, self.btn_open)
+        Dialog.setTabOrder(self.btn_open, self.btn_close)
+        Dialog.setTabOrder(self.btn_close, self.tabWidget)
+        Dialog.setTabOrder(self.tabWidget, self.i_baudRate_comboBox)
+        Dialog.setTabOrder(self.i_baudRate_comboBox, self.i_word_5bits_radio)
+        Dialog.setTabOrder(self.i_word_5bits_radio, self.i_word_6bits_radio)
+        Dialog.setTabOrder(self.i_word_6bits_radio, self.i_word_7bits_radio)
+        Dialog.setTabOrder(self.i_word_7bits_radio, self.i_word_8bits_radio)
+        Dialog.setTabOrder(self.i_word_8bits_radio, self.i_parityNone_radio)
+        Dialog.setTabOrder(self.i_parityNone_radio, self.i_parityEven_radio)
+        Dialog.setTabOrder(self.i_parityEven_radio, self.i_parityOdd_radio)
+        Dialog.setTabOrder(self.i_parityOdd_radio, self.i_stopBit1_radio)
+        Dialog.setTabOrder(self.i_stopBit1_radio, self.i_stopBit15_radio)
+        Dialog.setTabOrder(self.i_stopBit15_radio, self.i_stopBit2_radio)
+        Dialog.setTabOrder(self.i_stopBit2_radio, self.i_protocol_comboBox)
+        Dialog.setTabOrder(self.i_protocol_comboBox, self.i_terminator_comboBox)
+        Dialog.setTabOrder(self.i_terminator_comboBox, self.i_timeout_spinBox)
+        Dialog.setTabOrder(self.i_timeout_spinBox, self.i_howMuchChars_spinBox)
+        Dialog.setTabOrder(self.i_howMuchChars_spinBox, self.i_itsTerminator_lineEdit)
+        Dialog.setTabOrder(self.i_itsTerminator_lineEdit, self.i_automaticTerminator_checkBox)
+        Dialog.setTabOrder(self.i_automaticTerminator_checkBox, self.btn_save)
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "IwSK RS-232", None, QtGui.QApplication.UnicodeUTF8))
@@ -284,7 +312,7 @@ class Ui_Dialog(object):
         self.label_7.setText(QtGui.QApplication.translate("Dialog", "Terminowanie:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_11.setText(QtGui.QApplication.translate("Dialog", "Timeout", None, QtGui.QApplication.UnicodeUTF8))
         self.label_12.setText(QtGui.QApplication.translate("Dialog", "[ms]", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_13.setText(QtGui.QApplication.translate("Dialog", "znaki: ", None, QtGui.QApplication.UnicodeUTF8))
+        self.customTermator.setText(QtGui.QApplication.translate("Dialog", "Znaki: ", None, QtGui.QApplication.UnicodeUTF8))
         self.i_automaticTerminator_checkBox.setText(QtGui.QApplication.translate("Dialog", "automatycznie dołączaj terminator", None, QtGui.QApplication.UnicodeUTF8))
         self.btn_save.setText(QtGui.QApplication.translate("Dialog", "Zapisz", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtGui.QApplication.translate("Dialog", "Konfiguracja", None, QtGui.QApplication.UnicodeUTF8))
