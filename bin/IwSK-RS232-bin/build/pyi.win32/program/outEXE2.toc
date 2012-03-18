@@ -1,0 +1,10 @@
+('D:\\Karol\\Project\\IwSK-RS232\\bin\\IwSK-RS232-bin\\dist\\program.exe',
+ True,
+ False,
+ None,
+ None,
+ [],
+ False,
+ True,
+ 0,
+ 1332081380L)
