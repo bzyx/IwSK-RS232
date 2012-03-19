@@ -7,7 +7,7 @@ p3
 S'E'
 sS'baudrate'
 p4
-I115200
+I19200
 sS' '
 I00
 sS'bytesize'
@@ -16,9 +16,9 @@ I7
 sS'xonxoff'
 p6
 I00
-sS'port'
+sS'automaticTerminator'
 p7
-I2
+I01
 sS'interCharTimeout'
 p8
 NsS'rtscts'
@@ -34,11 +34,11 @@ p12
 I00
 sS'writeTimeout'
 p13
-NsS'automaticTerminator'
+NsS'port'
 p14
-I01
+I2
 sS'terminator'
 p15
-Vw\u0142asny
+VCR
 p16
 s.
