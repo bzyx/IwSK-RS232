@@ -21,10 +21,10 @@ class MyDialog(QtGui.QDialog):
 
         self.myConfig = Config()
         # bufor na tekst do wysłania
-        self.sendTextBuffor = ''
+        self.sendTextBuffor = u''
         
         # bufor na wartości odczytane
-        self.bufferRecived = ' '
+        self.bufferRecived = u''
         # Opcje wyboru sterowania magistrali
         self.protocolOptionDict = {'Brak': ' ', 'CTRL-S/CTRL-Q': 'xonxoff', 'DSR/DTR': 'dsrdtr', 'RTS/CTS': 'rtscts'}
         # Terminatory standardowe + terminator w�asny
@@ -171,6 +171,7 @@ class MyDialog(QtGui.QDialog):
     def recived(self):
         # TODO: ogarnac xonxoff
         # xonxoff = False
+        recivedText = u''
         print Config.serial.getCTS(), Config.serial.getDSR(), Config.serial.getRtsCts(), Config.serial.getRtsToggle()
         if  Config.serial.inWaiting():
             recivedText = Config.serial.read(Config.serial.inWaiting())
@@ -184,7 +185,7 @@ class MyDialog(QtGui.QDialog):
                     sendRecivePing = "rp<%s>!" % (time.strftime('%X'))
                     print repr(sendRecivePing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
                     Config.serial.write(sendRecivePing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
-                self.bufferRecived = ''
+                self.bufferRecived = u''
 
     @QtCore.pyqtSlot(str)
     def terminatorChanged(self, itemName):
@@ -206,7 +207,7 @@ class MyDialog(QtGui.QDialog):
         if Config.serial.getDSR() or Config.serial.getCTS() or Config.serial.xonxoff:
             # self.dtrRtsWrite(False)
             terminator = self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')]
-            sendText = str(self.ui.lineEdit.text())
+            sendText = unicode(self.ui.lineEdit.text())
             if self.myConfig.serialDict.get('automaticTerminator', True):
                 sendText += terminator
                 Config.serial.write(sendText)
@@ -218,7 +219,7 @@ class MyDialog(QtGui.QDialog):
                 if isTerminator:
                     self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
                     Config.serial.write(self.sendTextBuffor + terminator)
-                    self.sendTextBuffor = ''
+                    self.sendTextBuffor = u''
             self.ui.lineEdit.clear()
             # self.dtrRtsWrite(True)
 
