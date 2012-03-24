@@ -5,6 +5,7 @@ from PyQt4 import QtGui, QtCore
 from collections import OrderedDict
 from serial.tools import list_ports
 
+import serial
 import time
 import re
 
@@ -159,45 +160,56 @@ class MyDialog(QtGui.QDialog):
         
     @QtCore.pyqtSlot()
     def openPort(self):
-        Config.serial.open()
-        self.dtrRts()
-        self.dtrRtsWrite(True)
-        # self.dtrRtsWrite(True)
-        self.recivedTimer.start(1000)
-        print "Port Opened"
+        try:
+            Config.serial.open()
+            self.dtrRts()
+            self.dtrRtsWrite(True)
+            # self.dtrRtsWrite(True)
+            self.recivedTimer.start(1000)
+            print u"Port Opened / Port otwarty"
+        except serial.serialutil.SerialException as detail:
+            print u"Port %s jest juz otwarty! Aby dokonać zmian zamknij najpierw port \n\tszczegóły błedu: %s" \
+                    % (unicode(self.ui.i_portName_comboBox.itemText(self.myConfig.serialDict['port'])), detail)
 
     @QtCore.pyqtSlot()
     def closePort(self):
         self.recivedTimer.stop()
         Config.serial.close()
-        print "Port Closed"
+        print u"Port Closed / Prot zamknięty"
 
     @QtCore.pyqtSlot()
     def recived(self):
         # TODO: ogarnac xonxoff
         # xonxoff = False
         recivedText = u''
-        print Config.serial.getCTS(), Config.serial.getDSR(), Config.serial.getRtsCts(), Config.serial.getRtsToggle()
         if  Config.serial.inWaiting():
+            print "\tgetCTS:%s getDSR:%s\n\tgetRtsCts:%s getRtsToggle:%s" \
+                    % (Config.serial.getCTS(), Config.serial.getDSR(), Config.serial.getRtsCts(), Config.serial.getRtsToggle())
+            if(self.bufferRecived == u''):
+                print u"Odbieranie danych"
             recivedText = Config.serial.read(Config.serial.inWaiting())
+            print recivedText
             # if recivedText.find(
             self.bufferRecived += recivedText
             self.bufferRecived, isTerminator = self.searchTerminator(self.bufferRecived)
             print repr(self.bufferRecived)
             if isTerminator:
+                print u"Odebrano dane (znaleziono terminator)"
                 self.ui.o_recived_plainTextEdit.appendPlainText(self.bufferRecived)
                 if re.search(r'^ ?p<[0-2][0-9](:[0-5][0-9]){2}>!$', self.bufferRecived):
+                    print u"Odebrano ping"
                     sendRecivePing = u"rp<%s>!" % (time.strftime('%X'))
                     print repr(sendRecivePing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
                     Config.serial.write(sendRecivePing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
+                    print u"Wysłano ping zwrotny"
                 self.bufferRecived = u''
+                print u"Oczyszczono bufor odbioru danych"
 
     @QtCore.pyqtSlot(str)
     def terminatorChanged(self, itemName):
         shouldShow = False
         if itemName == u"własny":
             shouldShow = True
-            
         self.ui.i_howMuchChars_spinBox.setVisible(shouldShow)
         self.ui.i_itsTerminator_lineEdit.setVisible(shouldShow)
         self.ui.customTermator.setVisible(shouldShow)
@@ -206,6 +218,7 @@ class MyDialog(QtGui.QDialog):
     def ping(self):
         sendPing = u"p<%s>!" % (time.strftime('%X'))
         Config.serial.write(sendPing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', u'CR')])
+        print u"Wysłano ping"
 
     @QtCore.pyqtSlot()
     def send(self):
@@ -218,13 +231,16 @@ class MyDialog(QtGui.QDialog):
                 Config.serial.write(sendText)
                 sendText, isTerminator = self.searchTerminator(sendText)
                 self.ui.o_send_plainTextEdit.appendPlainText(sendText)
+                print u"Wysłano dane"
             else:
                 sendText, isTerminator = self.searchTerminator(sendText)
                 self.sendTextBuffor += sendText
+                print u"Wysłano dane do bufora BRAK TERMINATORA"
                 if isTerminator:
                     self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
                     Config.serial.write(self.sendTextBuffor + terminator)
                     self.sendTextBuffor = u''
+                    print u"Terminator znaleziony, dane wysłane, bufor wysyłania oprózniony"
             self.ui.lineEdit.clear()
             # self.dtrRtsWrite(True)
 
