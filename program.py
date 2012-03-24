@@ -207,23 +207,6 @@ class MyDialog(QtGui.QDialog):
     def send(self):
         # if Config.serial.getDSR() or Config.serial.getCTS() or Config.serial.xonxoff:
             # self.dtrRtsWrite(False)
-<<<<<<< HEAD
-        terminator = self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')]
-        sendText = unicode(self.ui.lineEdit.text(), "cp852")
-        if self.myConfig.serialDict.get('automaticTerminator', True):
-            sendText += terminator
-            Config.serial.write(sendText)
-            sendText, isTerminator = self.searchTerminator(sendText)
-            self.ui.o_send_plainTextEdit.appendPlainText(sendText)
-        else:
-            sendText, isTerminator = self.searchTerminator(sendText)
-            self.sendTextBuffor += sendText
-            if isTerminator:
-                self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
-                Config.serial.write(self.sendTextBuffor + terminator)
-                self.sendTextBuffor = ''
-        self.ui.lineEdit.clear()
-=======
             terminator = self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')]
             sendText = unicode(self.ui.lineEdit.text())
             if self.myConfig.serialDict.get('automaticTerminator', True):
@@ -239,7 +222,6 @@ class MyDialog(QtGui.QDialog):
                     Config.serial.write(self.sendTextBuffor + terminator)
                     self.sendTextBuffor = u''
             self.ui.lineEdit.clear()
->>>>>>> be5b807c0930286941122e85e5c28685b5fdabfc
             # self.dtrRtsWrite(True)
 
     def searchTerminator(self, text):
