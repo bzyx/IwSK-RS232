@@ -52,6 +52,7 @@ class MyDialog(QtGui.QDialog):
         self.ui.btn_pingFunction.clicked.connect(self.ping)
         # self.ui.i_howMuchChars_spinBox.valueChanged(int).connect(self.changedSizeTerminator)
         QtCore.QObject.connect(self.ui.i_howMuchChars_spinBox, QtCore.SIGNAL("valueChanged(int)"), self.changedSizeTerminator)
+        QtCore.QObject.connect(self.ui.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.reDrawKonfigurationTab)
         self.recivedTimer.timeout.connect(self.recived)
         self.ui.i_terminator_comboBox.currentIndexChanged[str].connect(self.terminatorChanged)
 
@@ -89,10 +90,11 @@ class MyDialog(QtGui.QDialog):
         self.stopBitsList = [self.ui.i_stopBit1_radio, \
                 self.ui.i_stopBit2_radio, \
                 self.ui.i_stopBit2_radio]
+        self.readAndSetGui()
 
+    def readAndSetGui(self):
         # Wczytujemy dane z poprzedniej konfiguracji jeśli taka była
         timeoutConfigValue = self.myConfig.serialDict['timeout']
-
         # Aktualizujemy interfejs użytkownika wczytanymi wartośćiami
         if timeoutConfigValue:
             self.ui.i_timeout_spinBox.setValue(timeoutConfigValue)
@@ -132,7 +134,9 @@ class MyDialog(QtGui.QDialog):
             protocolIndex = 0
         self.ui.i_protocol_comboBox.setCurrentIndex(protocolIndex)
 
-        Config.serial.stopbits = 1.5
+    def reDrawKonfigurationTab(self, tab):
+        if tab == 1:
+            self.readAndSetGui()
 
     def dtrRts(self):
         Config.serial.setRTS(False)
