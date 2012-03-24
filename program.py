@@ -91,6 +91,7 @@ class MyDialog(QtGui.QDialog):
         self.stopBitsList = [self.ui.i_stopBit1_radio, \
                 self.ui.i_stopBit2_radio, \
                 self.ui.i_stopBit2_radio]
+
         self.readAndSetGui()
 
     def readAndSetGui(self):
@@ -169,9 +170,9 @@ class MyDialog(QtGui.QDialog):
             # self.dtrRtsWrite(True)
             self.recivedTimer.start(1000)
             print u"Port Opened / Port otwarty"
-        except serial.serialutil.SerialException as detail:
-            print u"Port %s jest juz otwarty! Aby dokonać zmian zamknij najpierw port \n\tszczegóły błedu: %s" \
-                    % (self.myConfig.serialDict['port'], detail)
+        except serial.serialutil.SerialException:
+            print u"Port %s jest juz otwarty!" \
+                    % (self.myConfig.serialDict['port'])
 
     @QtCore.pyqtSlot()
     def closePort(self):
@@ -282,7 +283,7 @@ class MyDialog(QtGui.QDialog):
                 self.myConfig.serialDict['parity'] = Config.serial.PARITIES[self.paritiesList.index(parity)]
         for stopBit in self.stopBitsList:
             if(stopBit.isChecked()):
-                self.myConfig.serialDict['stopbits'] = Config.serial.STOPBITS[self.stopBitsList.index(stopBit)]
+                self.myConfig.serialDict['stopbits'] = int(stopBit.text())
         if self.ui.i_timeout_spinBox.value():
             self.myConfig.serialDict['timeout'] = self.ui.i_timeout_spinBox.value()
         else:

@@ -1,4 +1,6 @@
+make-bin.bat
 bin
 .project
 .pydevproject
 *pyc
+~
