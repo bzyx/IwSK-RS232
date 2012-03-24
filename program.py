@@ -106,8 +106,10 @@ class MyDialog(QtGui.QDialog):
         # protocolSet = lambda lista:
         # self.ui.i_protocol_comboBox.setCurrentIndex(self.ui.i_protocol_comboBox.\
         #         findText(self.myConfig.serialDict.get('p
-        # try:
-        self.ui.i_portName_comboBox.setCurrentIndex(self.comPortsList.index(self.myConfig.serialDict.get('port', 0)))
+        try:
+            self.ui.i_portName_comboBox.setCurrentIndex(self.comPortsList.index(self.myConfig.serialDict.get('port')))
+        except ValueError:
+            self.ui.i_portName_comboBox.setCurrentIndex(0)
         self.ui.i_automaticTerminator_checkBox.setChecked(self.myConfig.serialDict.get('automaticTerminator', True))
         if unicode(self.ui.i_terminator_comboBox.currentText()) == u"własny":
             self.ui.i_itsTerminator_lineEdit.setText(self.myConfig.serialDict.get('itsTerminator', ''))
@@ -169,7 +171,7 @@ class MyDialog(QtGui.QDialog):
             print u"Port Opened / Port otwarty"
         except serial.serialutil.SerialException as detail:
             print u"Port %s jest juz otwarty! Aby dokonać zmian zamknij najpierw port \n\tszczegóły błedu: %s" \
-                    % (self.ui.i_portName_comboBox.itemText(self.myConfig.serialDict['port']), detail)
+                    % (self.myConfig.serialDict['port'], detail)
 
     @QtCore.pyqtSlot()
     def closePort(self):
