@@ -1,0 +1,1 @@
+python C:\Python27\Tools\pyinstaller-1.5.1\pyinstaller.py --onefile D:\Karol\Project\IwSK-RS232\program.py --out D:\Karol\Project\IwSK-RS232\bin

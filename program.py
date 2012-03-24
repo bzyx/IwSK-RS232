@@ -132,6 +132,8 @@ class MyDialog(QtGui.QDialog):
             protocolIndex = 0
         self.ui.i_protocol_comboBox.setCurrentIndex(protocolIndex)
 
+        Config.serial.stopbits = 1.5
+
     def dtrRts(self):
         Config.serial.setRTS(False)
         Config.serial.setDTR(False)
@@ -180,7 +182,7 @@ class MyDialog(QtGui.QDialog):
             if isTerminator:
                 self.ui.o_recived_plainTextEdit.appendPlainText(self.bufferRecived)
                 if re.search(r'^ ?p<[0-2][0-9](:[0-5][0-9]){2}>!$', self.bufferRecived):
-                    sendRecivePing = "rp<%s>!" % (time.strftime('%X'))
+                    sendRecivePing = u"rp<%s>!" % (time.strftime('%X'))
                     print repr(sendRecivePing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
                     Config.serial.write(sendRecivePing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')])
                 self.bufferRecived = ''
@@ -197,28 +199,28 @@ class MyDialog(QtGui.QDialog):
 
     @QtCore.pyqtSlot()
     def ping(self):
-        sendPing = "p<%s>!" % (time.strftime('%X'))
+        sendPing = u"p<%s>!" % (time.strftime('%X'))
         Config.serial.write(sendPing + self.treminatorTypes[self.myConfig.serialDict.get('terminator', u'CR')])
 
     @QtCore.pyqtSlot()
     def send(self):
-        if Config.serial.getDSR() or Config.serial.getCTS() or Config.serial.xonxoff:
+        # if Config.serial.getDSR() or Config.serial.getCTS() or Config.serial.xonxoff:
             # self.dtrRtsWrite(False)
-            terminator = self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')]
-            sendText = unicode(self.ui.lineEdit.text(), "cp852")
-            if self.myConfig.serialDict.get('automaticTerminator', True):
-                sendText += terminator
-                Config.serial.write(sendText)
-                sendText, isTerminator = self.searchTerminator(sendText)
-                self.ui.o_send_plainTextEdit.appendPlainText(sendText)
-            else:
-                sendText, isTerminator = self.searchTerminator(sendText)
-                self.sendTextBuffor += sendText
-                if isTerminator:
-                    self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
-                    Config.serial.write(self.sendTextBuffor + terminator)
-                    self.sendTextBuffor = ''
-            self.ui.lineEdit.clear()
+        terminator = self.treminatorTypes[self.myConfig.serialDict.get('terminator', 'CR')]
+        sendText = unicode(self.ui.lineEdit.text(), "cp852")
+        if self.myConfig.serialDict.get('automaticTerminator', True):
+            sendText += terminator
+            Config.serial.write(sendText)
+            sendText, isTerminator = self.searchTerminator(sendText)
+            self.ui.o_send_plainTextEdit.appendPlainText(sendText)
+        else:
+            sendText, isTerminator = self.searchTerminator(sendText)
+            self.sendTextBuffor += sendText
+            if isTerminator:
+                self.ui.o_send_plainTextEdit.appendPlainText(self.sendTextBuffor)
+                Config.serial.write(self.sendTextBuffor + terminator)
+                self.sendTextBuffor = ''
+        self.ui.lineEdit.clear()
             # self.dtrRtsWrite(True)
 
     def searchTerminator(self, text):
