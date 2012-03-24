@@ -1,3 +1,4 @@
+#-*-coding: utf8-*-
 import cPickle
 from serial import Serial
 
@@ -14,6 +15,7 @@ class Config(object):
             self.load()
         except IOError:
             self.serialDict = Config.serial.getSettingsDict()
+            print u"Brak pliku wczytano i załadowano dane domyślne"
 
     def save(self):
         with open(self.configName, "wb") as fileConfig:
@@ -23,7 +25,9 @@ class Config(object):
                 Config.serial.port = self.serialDict['port']
             except KeyError:
                 pass
+            print u"Zapis zakończony powodzeniem"
             Config.serial.applySettingsDict(self.serialDict)
+            print u"Dane załadowane"
 
     def load(self):
         with open(self.configName, "rb") as fileConfig:
@@ -32,7 +36,9 @@ class Config(object):
                 Config.serial.port = self.serialDict['port']
             except KeyError:
                 pass
+            print u"Dane poprawnie odczytane z pliku"
             Config.serial.applySettingsDict(self.serialDict)
+            print u"Dane załadowane"
 
 if __name__ == "__main__":
     configTest = Config()
