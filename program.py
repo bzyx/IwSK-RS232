@@ -36,7 +36,7 @@ class MyDialog(QtGui.QDialog):
                                                        (u'własny', '')])
 
         # Tworzymy lista dostępnych w systemie portów COM
-        comPortsList = [portList[0] for portList in list_ports.comports()]
+        self.comPortsList = [portList[0] for portList in list_ports.comports()]
         
         #Timmer do odbioru danych/powoduje zap?tlenie programu
         self.recivedTimer = QtCore.QTimer(self)
@@ -62,7 +62,7 @@ class MyDialog(QtGui.QDialog):
             self.ui.i_baudRate_comboBox.addItem(repr(baudRate))
 
         # Tworzenie listy dostępnych portów COM - dla intefejsu użytkownika
-        for port in comPortsList:
+        for port in self.comPortsList:
             self.ui.i_portName_comboBox.addItem(port)
         
         # Dodajemy możliwe typy terminatora
@@ -107,7 +107,7 @@ class MyDialog(QtGui.QDialog):
         # self.ui.i_protocol_comboBox.setCurrentIndex(self.ui.i_protocol_comboBox.\
         #         findText(self.myConfig.serialDict.get('p
         # try:
-        self.ui.i_portName_comboBox.setCurrentIndex(self.myConfig.serialDict.get('port', 0))
+        self.ui.i_portName_comboBox.setCurrentIndex(self.comPortsList.index(self.myConfig.serialDict.get('port', 0)))
         self.ui.i_automaticTerminator_checkBox.setChecked(self.myConfig.serialDict.get('automaticTerminator', True))
         if unicode(self.ui.i_terminator_comboBox.currentText()) == u"własny":
             self.ui.i_itsTerminator_lineEdit.setText(self.myConfig.serialDict.get('itsTerminator', ''))
@@ -169,7 +169,7 @@ class MyDialog(QtGui.QDialog):
             print u"Port Opened / Port otwarty"
         except serial.serialutil.SerialException as detail:
             print u"Port %s jest juz otwarty! Aby dokonać zmian zamknij najpierw port \n\tszczegóły błedu: %s" \
-                    % (unicode(self.ui.i_portName_comboBox.itemText(self.myConfig.serialDict['port'])), detail)
+                    % (self.ui.i_portName_comboBox.itemText(self.myConfig.serialDict['port']), detail)
 
     @QtCore.pyqtSlot()
     def closePort(self):
@@ -270,7 +270,7 @@ class MyDialog(QtGui.QDialog):
             self.myConfig.serialDict[self.protocolOptionDict[\
                     unicode(self.ui.i_protocol_comboBox.currentText())]] = True
 
-        self.myConfig.serialDict['port'] = self.ui.i_portName_comboBox.currentIndex()   # +1
+        self.myConfig.serialDict['port'] = str(self.ui.i_portName_comboBox.currentText())
         self.myConfig.serialDict['baudrate'] = int(self.ui.i_baudRate_comboBox.currentText())
         for byteSize in self.byteSizeList:
             if(byteSize.isChecked()):
