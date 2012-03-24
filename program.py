@@ -75,8 +75,8 @@ class MyDialog(QtGui.QDialog):
         # reprezentująch parametry transmisji.
         # W celu ułatwienia zarz?dzania transmisją.
         # Długś słowa
-        self.byteSizeList = [self.ui.i_word_5bits_radio, \
-                self.ui.i_word_6bits_radio, \
+        self.byteSizeList = [self.ui.i_word_7bits_radio, \
+                self.ui.i_word_8bits_radio, \
                 self.ui.i_word_7bits_radio, \
                 self.ui.i_word_8bits_radio]
 
@@ -87,7 +87,7 @@ class MyDialog(QtGui.QDialog):
 
         # Liczba bitiów stopu
         self.stopBitsList = [self.ui.i_stopBit1_radio, \
-                self.ui.i_stopBit15_radio, \
+                self.ui.i_stopBit2_radio, \
                 self.ui.i_stopBit2_radio]
 
         # Wczytujemy dane z poprzedniej konfiguracji jeśli taka była

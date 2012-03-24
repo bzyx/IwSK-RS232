@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui\iwsk.ui'
 #
-# Created: Sat Mar 17 20:17:03 2012
-#      by: PyQt4 UI code generator 4.9
+# Created: Sat Mar 24 11:18:16 2012
+#      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -97,12 +97,6 @@ class Ui_Dialog(object):
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.i_word_5bits_radio = QtGui.QRadioButton(self.groupBox_2)
-        self.i_word_5bits_radio.setObjectName(_fromUtf8("i_word_5bits_radio"))
-        self.horizontalLayout.addWidget(self.i_word_5bits_radio)
-        self.i_word_6bits_radio = QtGui.QRadioButton(self.groupBox_2)
-        self.i_word_6bits_radio.setObjectName(_fromUtf8("i_word_6bits_radio"))
-        self.horizontalLayout.addWidget(self.i_word_6bits_radio)
         self.i_word_7bits_radio = QtGui.QRadioButton(self.groupBox_2)
         self.i_word_7bits_radio.setObjectName(_fromUtf8("i_word_7bits_radio"))
         self.horizontalLayout.addWidget(self.i_word_7bits_radio)
@@ -145,9 +139,6 @@ class Ui_Dialog(object):
         self.i_stopBit1_radio = QtGui.QRadioButton(self.groupBox_4)
         self.i_stopBit1_radio.setObjectName(_fromUtf8("i_stopBit1_radio"))
         self.horizontalLayout_3.addWidget(self.i_stopBit1_radio)
-        self.i_stopBit15_radio = QtGui.QRadioButton(self.groupBox_4)
-        self.i_stopBit15_radio.setObjectName(_fromUtf8("i_stopBit15_radio"))
-        self.horizontalLayout_3.addWidget(self.i_stopBit15_radio)
         self.i_stopBit2_radio = QtGui.QRadioButton(self.groupBox_4)
         self.i_stopBit2_radio.setObjectName(_fromUtf8("i_stopBit2_radio"))
         self.horizontalLayout_3.addWidget(self.i_stopBit2_radio)
@@ -242,7 +233,6 @@ class Ui_Dialog(object):
         self.label_9.setBuddy(self.o_send_plainTextEdit)
         self.label.setBuddy(self.i_portName_comboBox)
         self.label_2.setBuddy(self.i_baudRate_comboBox)
-        self.label_3.setBuddy(self.i_word_5bits_radio)
         self.label_4.setBuddy(self.i_parityNone_radio)
         self.label_5.setBuddy(self.i_stopBit1_radio)
         self.label_6.setBuddy(self.i_protocol_comboBox)
@@ -263,16 +253,13 @@ class Ui_Dialog(object):
         Dialog.setTabOrder(self.btn_open, self.btn_close)
         Dialog.setTabOrder(self.btn_close, self.tabWidget)
         Dialog.setTabOrder(self.tabWidget, self.i_baudRate_comboBox)
-        Dialog.setTabOrder(self.i_baudRate_comboBox, self.i_word_5bits_radio)
-        Dialog.setTabOrder(self.i_word_5bits_radio, self.i_word_6bits_radio)
-        Dialog.setTabOrder(self.i_word_6bits_radio, self.i_word_7bits_radio)
+        Dialog.setTabOrder(self.i_baudRate_comboBox, self.i_word_7bits_radio)
         Dialog.setTabOrder(self.i_word_7bits_radio, self.i_word_8bits_radio)
         Dialog.setTabOrder(self.i_word_8bits_radio, self.i_parityNone_radio)
         Dialog.setTabOrder(self.i_parityNone_radio, self.i_parityEven_radio)
         Dialog.setTabOrder(self.i_parityEven_radio, self.i_parityOdd_radio)
         Dialog.setTabOrder(self.i_parityOdd_radio, self.i_stopBit1_radio)
-        Dialog.setTabOrder(self.i_stopBit1_radio, self.i_stopBit15_radio)
-        Dialog.setTabOrder(self.i_stopBit15_radio, self.i_stopBit2_radio)
+        Dialog.setTabOrder(self.i_stopBit1_radio, self.i_stopBit2_radio)
         Dialog.setTabOrder(self.i_stopBit2_radio, self.i_protocol_comboBox)
         Dialog.setTabOrder(self.i_protocol_comboBox, self.i_terminator_comboBox)
         Dialog.setTabOrder(self.i_terminator_comboBox, self.i_timeout_spinBox)
@@ -296,8 +283,6 @@ class Ui_Dialog(object):
         self.label.setText(QtGui.QApplication.translate("Dialog", "Port:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("Dialog", "Prędkość transmisji:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_3.setText(QtGui.QApplication.translate("Dialog", "Długość słowa:", None, QtGui.QApplication.UnicodeUTF8))
-        self.i_word_5bits_radio.setText(QtGui.QApplication.translate("Dialog", "5", None, QtGui.QApplication.UnicodeUTF8))
-        self.i_word_6bits_radio.setText(QtGui.QApplication.translate("Dialog", "6", None, QtGui.QApplication.UnicodeUTF8))
         self.i_word_7bits_radio.setText(QtGui.QApplication.translate("Dialog", "7", None, QtGui.QApplication.UnicodeUTF8))
         self.i_word_8bits_radio.setText(QtGui.QApplication.translate("Dialog", "8", None, QtGui.QApplication.UnicodeUTF8))
         self.label_4.setText(QtGui.QApplication.translate("Dialog", "Parzystość:", None, QtGui.QApplication.UnicodeUTF8))
@@ -306,7 +291,6 @@ class Ui_Dialog(object):
         self.i_parityOdd_radio.setText(QtGui.QApplication.translate("Dialog", "bit nieparzystości", None, QtGui.QApplication.UnicodeUTF8))
         self.label_5.setText(QtGui.QApplication.translate("Dialog", "Bit stopu:", None, QtGui.QApplication.UnicodeUTF8))
         self.i_stopBit1_radio.setText(QtGui.QApplication.translate("Dialog", "1", None, QtGui.QApplication.UnicodeUTF8))
-        self.i_stopBit15_radio.setText(QtGui.QApplication.translate("Dialog", "1.5", None, QtGui.QApplication.UnicodeUTF8))
         self.i_stopBit2_radio.setText(QtGui.QApplication.translate("Dialog", "2", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("Dialog", "Kontrola przepływu:", None, QtGui.QApplication.UnicodeUTF8))
         self.label_7.setText(QtGui.QApplication.translate("Dialog", "Terminowanie:", None, QtGui.QApplication.UnicodeUTF8))
