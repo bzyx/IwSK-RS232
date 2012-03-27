@@ -78,8 +78,6 @@ class MyDialog(QtGui.QDialog):
         # W celu ułatwienia zarz?dzania transmisją.
         # Długś słowa
         self.byteSizeList = [self.ui.i_word_7bits_radio, \
-                self.ui.i_word_8bits_radio, \
-                self.ui.i_word_7bits_radio, \
                 self.ui.i_word_8bits_radio]
 
         # Parzystość
@@ -89,7 +87,6 @@ class MyDialog(QtGui.QDialog):
 
         # Liczba bitiów stopu
         self.stopBitsList = [self.ui.i_stopBit1_radio, \
-                self.ui.i_stopBit2_radio, \
                 self.ui.i_stopBit2_radio]
 
         self.readAndSetGui()
@@ -119,9 +116,9 @@ class MyDialog(QtGui.QDialog):
         #     self.ui.i_portName_comboBox.setCurrentIndex(0)
         
         # Odczytanie i ustwienie wybranej wartości długości słowa, parzystości, liczby bitów stopu
-        byteSizeIndex = Config.serial.BYTESIZES.index(self.myConfig.serialDict['bytesize'])
+        byteSizeIndex = Config.serial.BYTESIZES[2:].index(self.myConfig.serialDict['bytesize'])
         paritiesIndex = Config.serial.PARITIES.index(self.myConfig.serialDict['parity'])
-        stopBitsIndex = Config.serial.STOPBITS.index(self.myConfig.serialDict['stopbits'])
+        stopBitsIndex = Config.serial.STOPBITS[::2].index(self.myConfig.serialDict['stopbits'])
         
         self.byteSizeList[byteSizeIndex].setChecked(True)
         self.paritiesList[paritiesIndex].setChecked(True)
