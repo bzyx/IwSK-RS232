@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui\iwsk.ui'
 #
-# Created: Sat Mar 24 16:11:51 2012
+# Created: Thu Jun 14 00:42:10 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -240,7 +240,7 @@ class Ui_Dialog(object):
         self.label_11.setBuddy(self.i_timeout_spinBox)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
         Dialog.setTabOrder(self.i_portName_comboBox, self.o_recived_plainTextEdit)
         Dialog.setTabOrder(self.o_recived_plainTextEdit, self.o_send_plainTextEdit)
